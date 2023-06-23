@@ -1,6 +1,5 @@
 #pragma once
 
-// #include <deque>
 #include <vector>
 
 template <typename T>
@@ -9,6 +8,7 @@ class DiscreteTf
 private:
     std::vector<T> input_coefficient_, output_coefficient_;
     std::vector<T> input_, output_;
+    int index_ = 0;
     size_t dim_;
 
 public:
@@ -51,56 +51,49 @@ public:
         input_.resize(dim_);
         output_.clear();
         output_.resize(dim_);
+        index_ = 0;
 
         return true;
     }
 
     T Step(T input)
     {
-        input_.pop_back();
-        input_.insert(input_.begin(), input);
-        // for (size_t i = dim_ - 1; i > 0; i--)
-        // {
-        //     input_.at(i) = input_.at(i - 1);
-        // }
+        input_.at(index_) = input;
 
-        // input_.at(0) = input;
-
+        int temp_index = index_;
         T output = 0;
-
-        for (size_t i = 0; i < dim_; i++)
-        {
-            output += input_coefficient_.at(i) * input_.at(i);
-        }
 
         for (size_t i = 0; i < dim_ - 1; i++)
         {
-            output -= output_coefficient_.at(i) * output_.at(i);
+            output += input_coefficient_.at(i) * input_.at(temp_index) - output_coefficient_.at(i) * output_.at(temp_index);
+
+            if (temp_index == 0)
+            {
+                temp_index = dim_ - 1;
+            }
+            else
+            {
+                temp_index--;
+            }
         }
 
-        output_.pop_back();
-        output_.insert(output_.begin(), output);
+        output += input_coefficient_.at(dim_ - 1) * input_.at(temp_index);
 
-        // for (size_t i = dim_ - 1; i > 0; i--)
-        // {
-        //     output_.at(i) = output_.at(i - 1);
-        // }
+        index_++;
+        if (index_ >= dim_)
+        {
+            index_ = 0;
+        }
 
-        // output_.at(0) = output;
+        output_.at(index_) = output;
 
         return output;
     }
 
     void ResetState()
     {
-        for (auto &var : input_)
-        {
-            var = 0;
-        }
-
-        for (auto &var : output_)
-        {
-            var = 0;
-        }
+        std::fill(input_.begin(), input_.end(), 0);
+        std::fill(output_.begin(), output_.end(), 0);
+        index_ = 0;
     }
 };

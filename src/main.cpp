@@ -45,7 +45,7 @@ double Step1(double input)
 int main(int, char const **)
 {
     RunTimeStatus run_time_status;
-    DiscreteTf<double> dtf({66.2117333333333, -124.136000000000, 58.1856000000000}, {1, -0.333333333333333, -0.666666666666667});
+    DiscreteTf<double> dtf({66.2117333333333, -124.136000000000, 58.1856000000000,87}, {1, -0.333333333333333, -0.666666666666667,-0.5});
 
     for (size_t i = 0; i < 10; i++)
     {
