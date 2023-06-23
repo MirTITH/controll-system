@@ -31,10 +31,10 @@ public:
 int main(int, char const **)
 {
     RunTimeStatus run_time_status;
-    DiscreteTf<double> dtf({4, 2, 3, 5}, {2, 5, 6, 7, 4, 6, 8});
+    DiscreteTf<double> dtf({66.2117333333333,-124.136000000000,58.1856000000000}, {1,-0.333333333333333,-0.666666666666667});
 
     run_time_status.Start();
-    for (size_t i = 0; i < 100000; i++)
+    for (size_t i = 0; i < 1000000; i++)
     {
         dtf.Step(1);
     }
