@@ -47,6 +47,11 @@ int main(int, char const **)
     RunTimeStatus run_time_status;
     DiscreteTf<double> dtf({66.2117333333333, -124.136000000000, 58.1856000000000}, {1, -0.333333333333333, -0.666666666666667});
 
+    for (size_t i = 0; i < 10; i++)
+    {
+        cout << Step1(1) << "   " << dtf.Step(1) << endl;
+    }
+
     run_time_status.Start();
     for (size_t i = 0; i < 1000000; i++)
     {

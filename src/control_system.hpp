@@ -1,6 +1,6 @@
 #pragma once
 
-#include <deque>
+// #include <deque>
 #include <vector>
 
 template <typename T>
@@ -8,7 +8,7 @@ class DiscreteTf
 {
 private:
     std::vector<T> input_coefficient_, output_coefficient_;
-    std::deque<T> input_, output_;
+    std::vector<T> input_, output_;
     size_t dim_;
 
 public:
@@ -57,8 +57,13 @@ public:
 
     T Step(T input)
     {
-        input_.pop_back();
-        input_.push_front(input);
+        for (size_t i = dim_ - 1; i > 0; i--)
+        {
+            input_.at(i) = input_.at(i - 1);
+        }
+
+        input_.at(0) = input;
+
         T output = 0;
 
         for (size_t i = 0; i < dim_; i++)
@@ -71,8 +76,13 @@ public:
             output -= output_coefficient_.at(i) * output_.at(i);
         }
 
-        output_.pop_back();
-        output_.push_front(output);
+        for (size_t i = dim_ - 1; i > 0; i--)
+        {
+            output_.at(i) = output_.at(i - 1);
+        }
+
+        output_.at(0) = output;
+
         return output;
     }
 
