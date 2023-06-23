@@ -57,12 +57,14 @@ public:
 
     T Step(T input)
     {
-        for (size_t i = dim_ - 1; i > 0; i--)
-        {
-            input_.at(i) = input_.at(i - 1);
-        }
+        input_.pop_back();
+        input_.insert(input_.begin(), input);
+        // for (size_t i = dim_ - 1; i > 0; i--)
+        // {
+        //     input_.at(i) = input_.at(i - 1);
+        // }
 
-        input_.at(0) = input;
+        // input_.at(0) = input;
 
         T output = 0;
 
@@ -76,12 +78,15 @@ public:
             output -= output_coefficient_.at(i) * output_.at(i);
         }
 
-        for (size_t i = dim_ - 1; i > 0; i--)
-        {
-            output_.at(i) = output_.at(i - 1);
-        }
+        output_.pop_back();
+        output_.insert(output_.begin(), output);
 
-        output_.at(0) = output;
+        // for (size_t i = dim_ - 1; i > 0; i--)
+        // {
+        //     output_.at(i) = output_.at(i - 1);
+        // }
+
+        // output_.at(0) = output;
 
         return output;
     }
