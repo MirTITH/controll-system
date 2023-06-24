@@ -1,7 +1,9 @@
 #include <iostream>
 #include <thread>
-#include "control_system.hpp"
+#include "discrete_tf.hpp"
+#include "z_tf.hpp"
 #include <chrono>
+#include "pid_controller.hpp"
 
 using namespace std;
 
@@ -28,9 +30,18 @@ public:
     }
 };
 
-double Step1(double input)
+static double inputs[3], outputs[3];
+
+void FastStepReset()
 {
-    static double inputs[3], outputs[3];
+    for (size_t i = 0; i < 3; i++) {
+        inputs[i]  = 0;
+        outputs[i] = 0;
+    }
+}
+
+double FastStep(double input)
+{
     inputs[2] = inputs[1];
     inputs[1] = inputs[0];
     inputs[0] = input;
@@ -42,71 +53,85 @@ double Step1(double input)
     return outputs[0];
 }
 
+void FastStepTest()
+{
+    RunTimeStatus timer;
+    timer.Start();
+    for (size_t i = 0; i < 100000000; i++) {
+        FastStep(1);
+    }
+    timer.End("FastStep: ");
+    cout << FastStep(1) << endl
+         << endl;
+    FastStepReset();
+    for (size_t i = 0; i < 10; i++) {
+        cout << FastStep(1) << endl;
+    }
+    cout << endl;
+}
+
+template <typename T>
+void TfSpeedTest(DiscreteTf<T> &tf, const string &info = "Time: ")
+{
+    RunTimeStatus timer;
+    timer.Start();
+    for (size_t i = 0; i < 100000000; i++) {
+        tf.Step(1);
+    }
+    timer.End(info);
+    cout << tf.Step(1) << endl
+         << endl;
+
+    tf.ResetState();
+    for (size_t i = 0; i < 50; i++) {
+        cout << tf.Step(1) << endl;
+    }
+    for (size_t i = 0; i < 50; i++) {
+        cout << tf.Step(-1) << endl;
+    }
+    cout << endl;
+}
+
+// template <typename T>
+// void TfSpeedTest(ZTf<T> &tf, const string &info = "Time: ")
+// {
+//     RunTimeStatus timer;
+//     timer.Start();
+//     for (size_t i = 0; i < 100000000; i++) {
+//         tf.Step(1);
+//     }
+//     timer.End(info);
+//     cout << tf.Step(1) << endl
+//          << endl;
+//     tf.ResetState();
+//     for (size_t i = 0; i < 10; i++) {
+//         cout << tf.Step(1) << endl;
+//     }
+//     cout << endl;
+// }
+
 int main(int, char const **)
 {
     RunTimeStatus run_time_status;
-    DiscreteTf<double> dtf({66.2117333333333, -124.136000000000, 58.1856000000000},
-                           {1, -0.333333333333333, -0.666666666666667});
+    // ZTf<float> ztf({66.2117333333333, -124.136000000000, 58.1856000000000},
+    //                {1, -0.333333333333333, -0.666666666666667});
 
-    dtf.ResetState();
-    run_time_status.Start();
-    for (size_t i = 0; i < 100000000; i++)
-    {
-        dtf.Step(1);
-    }
-    run_time_status.End("dtf.Step: ");
-    for (size_t i = 0; i < 10; i++)
-    {
-        cout << dtf.Step(1) << endl;
-    }
-    cout << endl;
+    PidnAntiWindup<float> pidna(1, 2, 0, 100, 0.1, 3, -3);
+    Pidn<float> pidn(1, 2, 0, 100, 0.1);
+    Pdn<float> pdn(1, 2, 100, 0.1);
 
-    dtf.ResetState();
-    run_time_status.Start();
-    for (size_t i = 0; i < 100000000; i++)
-    {
-        dtf.Step1(1);
-    }
-    run_time_status.End("dtf.Step1: ");
-    for (size_t i = 0; i < 10; i++)
-    {
-        cout << dtf.Step1(1) << endl;
-    }
-    cout << endl;
+    // // FastStep
+    // FastStepTest();
 
-    dtf.ResetState();
-    run_time_status.Start();
-    for (size_t i = 0; i < 100000000; i++)
-    {
-        dtf.Step2(1);
-    }
-    run_time_status.End("dtf.Step2: ");
-    for (size_t i = 0; i < 10; i++)
-    {
-        cout << dtf.Step2(1) << endl;
-    }
-    cout << endl;
+    // // PIDN
+    // TfSpeedTest(pidn, "pidn: ");
 
-    // // Output
-    // dtf.ResetState();
-    // for (size_t i = 0; i < 10; i++)
-    // {
-    //     cout << dtf.Step(1) << endl;
-    // }
-    // cout << endl;
+    // // ZTf
+    // TfSpeedTest(ztf, "ztf: ");
 
-    // dtf.ResetState();
-    // for (size_t i = 0; i < 10; i++)
-    // {
-    //     cout << dtf.Step1(1) << endl;
-    // }
-    // cout << endl;
-
-    // dtf.ResetState();
-    // for (size_t i = 0; i < 10; i++)
-    // {
-    //     cout << dtf.Step2(1) << endl;
-    // }
+    TfSpeedTest(pdn, "pdn: ");
+    TfSpeedTest(pidn, "pidn: ");
+    TfSpeedTest(pidna, "pidna: ");
 
     return 0;
 }
