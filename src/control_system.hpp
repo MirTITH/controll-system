@@ -8,7 +8,7 @@ class DiscreteTf
 private:
     std::vector<T> input_coefficient_, output_coefficient_;
     std::vector<T> input_, output_;
-    int index_ = 0;
+    size_t index_ = 0;
     size_t dim_;
 
 public:
@@ -60,7 +60,7 @@ public:
     {
         input_.at(index_) = input;
 
-        int temp_index = index_;
+        auto temp_index = index_;
         T output = 0;
 
         for (size_t i = 0; i < dim_ - 1; i++)
@@ -86,6 +86,62 @@ public:
         }
 
         output_.at(index_) = output;
+
+        return output;
+    }
+
+    T Step1(T input)
+    {
+        for (size_t i = dim_ - 1; i > 0; i--)
+        {
+            input_.at(i) = input_.at(i - 1);
+        }
+
+        input_.at(0) = input;
+
+        T output = 0;
+
+        for (size_t i = 0; i < dim_; i++)
+        {
+            output += input_coefficient_.at(i) * input_.at(i);
+        }
+
+        for (size_t i = 0; i < dim_ - 1; i++)
+        {
+            output -= output_coefficient_.at(i) * output_.at(i);
+        }
+
+        for (size_t i = dim_ - 1; i > 0; i--)
+        {
+            output_.at(i) = output_.at(i - 1);
+        }
+
+        output_.at(0) = output;
+
+        return output;
+    }
+
+    T Step2(T input)
+    {
+        std::move_backward(input_.begin(), input_.end() - 1, input_.end());
+
+        input_.at(0) = input;
+
+        T output = 0;
+
+        for (size_t i = 0; i < dim_; i++)
+        {
+            output += input_coefficient_.at(i) * input_.at(i);
+        }
+
+        for (size_t i = 0; i < dim_ - 1; i++)
+        {
+            output -= output_coefficient_.at(i) * output_.at(i);
+        }
+
+        std::move_backward(output_.begin(), output_.end() - 1, output_.end());
+
+        output_.at(0) = output;
 
         return output;
     }

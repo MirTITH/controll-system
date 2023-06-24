@@ -45,28 +45,68 @@ double Step1(double input)
 int main(int, char const **)
 {
     RunTimeStatus run_time_status;
-    DiscreteTf<double> dtf({66.2117333333333, -124.136000000000, 58.1856000000000,87}, {1, -0.333333333333333, -0.666666666666667,-0.5});
+    DiscreteTf<double> dtf({66.2117333333333, -124.136000000000, 58.1856000000000},
+                           {1, -0.333333333333333, -0.666666666666667});
 
-    for (size_t i = 0; i < 10; i++)
-    {
-        cout << Step1(1) << "   " << dtf.Step(1) << endl;
-    }
-
+    dtf.ResetState();
     run_time_status.Start();
-    for (size_t i = 0; i < 1000000; i++)
+    for (size_t i = 0; i < 100000000; i++)
     {
         dtf.Step(1);
-        // Step1(1);
     }
-    run_time_status.End();
-
-    run_time_status.Start();
-    for (size_t i = 0; i < 1000000; i++)
+    run_time_status.End("dtf.Step: ");
+    for (size_t i = 0; i < 10; i++)
     {
-        // dtf.Step(1);
-        Step1(1);
+        cout << dtf.Step(1) << endl;
     }
-    run_time_status.End();
+    cout << endl;
+
+    dtf.ResetState();
+    run_time_status.Start();
+    for (size_t i = 0; i < 100000000; i++)
+    {
+        dtf.Step1(1);
+    }
+    run_time_status.End("dtf.Step1: ");
+    for (size_t i = 0; i < 10; i++)
+    {
+        cout << dtf.Step1(1) << endl;
+    }
+    cout << endl;
+
+    dtf.ResetState();
+    run_time_status.Start();
+    for (size_t i = 0; i < 100000000; i++)
+    {
+        dtf.Step2(1);
+    }
+    run_time_status.End("dtf.Step2: ");
+    for (size_t i = 0; i < 10; i++)
+    {
+        cout << dtf.Step2(1) << endl;
+    }
+    cout << endl;
+
+    // // Output
+    // dtf.ResetState();
+    // for (size_t i = 0; i < 10; i++)
+    // {
+    //     cout << dtf.Step(1) << endl;
+    // }
+    // cout << endl;
+
+    // dtf.ResetState();
+    // for (size_t i = 0; i < 10; i++)
+    // {
+    //     cout << dtf.Step1(1) << endl;
+    // }
+    // cout << endl;
+
+    // dtf.ResetState();
+    // for (size_t i = 0; i < 10; i++)
+    // {
+    //     cout << dtf.Step2(1) << endl;
+    // }
 
     return 0;
 }
