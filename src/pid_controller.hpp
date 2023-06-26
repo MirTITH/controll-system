@@ -17,6 +17,7 @@ protected:
 
     void UpdateCoefficient()
     {
+        // z 反变换并化简后的系数
         input_coefficient_.at(0)  = Kp + (Ki * Ts) / 2 + (2 * Kd * Kn) / (2 + Kn * Ts);
         input_coefficient_.at(1)  = (-4 * (Kd * Kn + Kp) + Ki * Kn * Ts * Ts) / (2 + Kn * Ts);
         input_coefficient_.at(2)  = (4 * Kd * Kn - (2 * Kp - Ki * Ts) * (-2 + Kn * Ts)) / (4 + 2 * Kn * Ts);
@@ -25,13 +26,28 @@ protected:
     }
 
 public:
+    /**
+     * @brief 基于双线性变换的离散 PID 控制器，Simulink 中离散 pid 模块实现
+     *
+     * @param Kp 比例项
+     * @param Ki 积分项
+     * @param Kd 微分项
+     * @param Kn 滤波器系数
+     * @param Ts 采样时间
+     */
     Pidn(T Kp, T Ki, T Kd, T Kn, T Ts)
         : Kp(Kp), Ki(Ki), Kd(Kd), Kn(Kn), Ts(Ts)
     {
         UpdateCoefficient();
         ResetState();
     }
-
+    /**
+     * @param Kp 比例项
+     * @param Ki 积分项
+     * @param Kd 微分项
+     * @param Kn 滤波器系数
+     * @param Ts 采样时间
+     */
     void SetParam(T Kp, T Ki, T Kd, T Kn, T Ts)
     {
         this->Kp = Kp;
@@ -42,12 +58,22 @@ public:
         UpdateCoefficient();
     }
 
+    /**
+     * @brief 重置内部状态，如积分值等
+     *
+     */
     void ResetState() override
     {
         std::fill(inputs_.begin(), inputs_.end(), 0);
         std::fill(outputs_.begin(), outputs_.end(), 0);
     }
 
+    /**
+     * @brief 走一个周期
+     *
+     * @param input 输入（误差）
+     * @return T 输出
+     */
     T Step(T input) override
     {
         inputs_[2]  = inputs_[1];

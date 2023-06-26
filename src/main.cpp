@@ -4,6 +4,9 @@
 #include "z_tf.hpp"
 #include <chrono>
 #include "pid_controller.hpp"
+#include <deque>
+#include <queue>
+#include "ring_queue.hpp"
 
 using namespace std;
 
@@ -55,15 +58,15 @@ double FastStep(double input)
 
 void FastStepTest()
 {
-    RunTimeStatus timer;
-    timer.Start();
-    for (size_t i = 0; i < 100000000; i++) {
-        FastStep(1);
-    }
-    timer.End("FastStep: ");
-    cout << FastStep(1) << endl
-         << endl;
-    FastStepReset();
+    // RunTimeStatus timer;
+    // timer.Start();
+    // for (size_t i = 0; i < 100000000; i++) {
+    //     FastStep(1);
+    // }
+    // timer.End("FastStep: ");
+    // cout << FastStep(1) << endl
+    //      << endl;
+    // FastStepReset();
     for (size_t i = 0; i < 10; i++) {
         cout << FastStep(1) << endl;
     }
@@ -71,11 +74,11 @@ void FastStepTest()
 }
 
 template <typename T>
-void TfSpeedTest(DiscreteTf<T> &tf, const string &info = "Time: ")
+void TfSpeedTest(T &tf, const string &info = "Time: ")
 {
     RunTimeStatus timer;
     timer.Start();
-    for (size_t i = 0; i < 100000000; i++) {
+    for (size_t i = 0; i < 10000000; i++) {
         tf.Step(1);
     }
     timer.End(info);
@@ -83,12 +86,12 @@ void TfSpeedTest(DiscreteTf<T> &tf, const string &info = "Time: ")
          << endl;
 
     tf.ResetState();
-    for (size_t i = 0; i < 50; i++) {
+    for (size_t i = 0; i < 10; i++) {
         cout << tf.Step(1) << endl;
     }
-    for (size_t i = 0; i < 50; i++) {
-        cout << tf.Step(-1) << endl;
-    }
+    // for (size_t i = 0; i < 50; i++) {
+    //     cout << tf.Step(-1) << endl;
+    // }
     cout << endl;
 }
 
@@ -113,25 +116,30 @@ void TfSpeedTest(DiscreteTf<T> &tf, const string &info = "Time: ")
 int main(int, char const **)
 {
     RunTimeStatus run_time_status;
-    // ZTf<float> ztf({66.2117333333333, -124.136000000000, 58.1856000000000},
-    //                {1, -0.333333333333333, -0.666666666666667});
+    ZTf<double> ztf({66.2117333333333, -124.136000000000, 58.1856000000000},
+                    {1, -0.333333333333333, -0.666666666666667});
 
-    PidnAntiWindup<float> pidna(1, 2, 0, 100, 0.1, 3, -3);
-    Pidn<float> pidn(1, 2, 0, 100, 0.1);
-    Pdn<float> pdn(1, 2, 100, 0.1);
+    ZTf1<double> ztf1({66.2117333333333, -124.136000000000, 58.1856000000000},
+                                   {1, -0.333333333333333, -0.666666666666667});
+
+
+    // PidnAntiWindup<float> pidna(1, 2, 0, 100, 0.1, 3, -3);
+    // Pidn<float> pidn(1, 2, 0, 100, 0.1);
+    // Pdn<float> pdn(1, 2, 100, 0.1);
 
     // // FastStep
-    // FastStepTest();
+    FastStepTest();
 
     // // PIDN
     // TfSpeedTest(pidn, "pidn: ");
 
-    // // ZTf
-    // TfSpeedTest(ztf, "ztf: ");
 
-    TfSpeedTest(pdn, "pdn: ");
-    TfSpeedTest(pidn, "pidn: ");
-    TfSpeedTest(pidna, "pidna: ");
+    TfSpeedTest(ztf, "ztf: ");
+    TfSpeedTest(ztf1, "ztf1: ");
+
+    // TfSpeedTest(pdn, "pdn: ");
+    // TfSpeedTest(pidn, "pidn: ");
+    // TfSpeedTest(pidna, "pidna: ");
 
     return 0;
 }

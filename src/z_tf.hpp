@@ -2,6 +2,7 @@
 
 #include "discrete_tf.hpp"
 #include <vector>
+#include "ring_queue.hpp"
 
 template <typename T>
 class ZTf : public DiscreteTf<T>
@@ -145,4 +146,73 @@ public:
 
         return output;
     } */
+};
+
+template <typename T>
+class ZTf1 : public DiscreteTf<T>
+{
+private:
+    std::vector<T> input_coefficient_, output_coefficient_;
+    T input_c0;
+    RingQueue<T> inputs_, outputs_;
+    size_t dim_;
+
+public:
+    ZTf1(){};
+
+    ZTf1(std::vector<T> num, std::vector<T> den)
+    {
+        Init(num, den);
+    }
+
+    bool Init(std::vector<T> num, std::vector<T> den)
+    {
+        if (num.size() > den.size()) {
+            // 分子阶数不能大于分母，否则是非因果系统
+            return false;
+        }
+
+        dim_ = den.size();
+
+        if (num.size() < dim_) {
+            // 使分子分母维数相同
+            num.insert(num.begin(), dim_ - num.size(), 0);
+        }
+
+        input_c0 = num.at(0) / den.at(0);
+        input_coefficient_.resize(dim_ - 1);
+        for (size_t i = 0; i < dim_ - 1; i++) {
+            input_coefficient_.at(i) = num.at(i + 1) / den.at(0);
+        }
+
+        output_coefficient_.resize(dim_ - 1);
+        for (size_t i = 0; i < dim_ - 1; i++) {
+            output_coefficient_.at(i) = -den.at(i + 1) / den.at(0);
+        }
+
+        inputs_.set_size(dim_, 0);
+        outputs_.set_size(dim_, 0);
+
+        return true;
+    }
+
+    T Step(T input) override
+    {
+        T output = input_c0 * input;
+        for (size_t i = 0; i < dim_ - 1; i++) {
+            output += input_coefficient_[i] * inputs_[i];
+            output += output_coefficient_[i] * outputs_[i];
+        }
+
+        inputs_.push_front(input);
+        outputs_.push_front(output);
+
+        return output;
+    }
+
+    void ResetState() override
+    {
+        inputs_.fill(0);
+        outputs_.fill(0);
+    }
 };
