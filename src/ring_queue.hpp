@@ -55,22 +55,40 @@ public:
 
     T &operator[](size_t index)
     {
-        return data_[(pos_ + index) % size_];
+        auto temp = pos_ + index;
+        if (temp >= size_) {
+            temp -= size_;
+        }
+
+        return data_[temp];
     }
 
     const T &operator[](size_t index) const
     {
-        return data_[(pos_ + index) % size_];
+        auto temp = pos_ + index;
+        if (temp >= size_) {
+            temp -= size_;
+        }
+
+        return data_[temp];
     }
 
     T &at(size_t index)
     {
-        return data_.at((pos_ + index) % size_);
+        auto temp = pos_ + index;
+        if (temp >= size_) {
+            temp -= size_;
+        }
+        return data_.at(temp);
     }
 
     const T &at(size_t index) const
     {
-        return data_.at((pos_ + index) % size_);
+        auto temp = pos_ + index;
+        if (temp >= size_) {
+            temp -= size_;
+        }
+        return data_.at(temp);
     }
 
     size_t size() const
