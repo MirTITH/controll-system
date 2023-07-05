@@ -2,7 +2,7 @@
  * @file z_tf.hpp
  * @author X. Y.
  * @brief Z 传递函数
- * @version 0.1
+ * @version 0.2
  * @date 2023-06-26
  *
  * @copyright Copyright (c) 2023
@@ -13,7 +13,10 @@
 
 #include "discrete_tf.hpp"
 #include <vector>
-#include <stdexcept>
+#include <cassert>
+
+namespace control_system
+{
 
 /**
  * @brief Z传递函数
@@ -61,10 +64,7 @@ public:
     {
         int size_diff = den.size() - num.size(); // 分母维数与分子维数之差
 
-        if (size_diff < 0) {
-            // 分子阶数不能大于分母，否则是非因果系统
-            throw std::logic_error("The size of numerator is larger than the size of denominator.");
-        }
+        assert(size_diff >= 0); // 分子阶数不能大于分母，否则是非因果系统
 
         dim_    = den.size();
         dim_m1_ = dim_ - 1;
@@ -72,9 +72,7 @@ public:
         input_coefficient_.resize(dim_m1_);
         output_coefficient_.resize(dim_m1_);
 
-        if (den.at(0) == 0) {
-            throw std::runtime_error("den.at(0) cannot be 0!");
-        }
+        assert(den.at(0) != 0);
 
         // 输入系数 i0
         if (size_diff == 0) {
@@ -113,9 +111,7 @@ public:
      */
     T Step(T input) override
     {
-        if (dim_ == 0) {
-            throw std::runtime_error("dim_ == 0! Did you forget to call Init()?");
-        }
+        assert(dim_ != 0);
 
         T output = input_c0 * input;
         for (size_t i = 0; i < dim_m1_; i++) {
@@ -145,3 +141,5 @@ public:
         index_ = 0;
     }
 };
+
+} // namespace control_system

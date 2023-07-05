@@ -1,122 +1,46 @@
-#include <iostream>
-#include <thread>
-#include "discrete_tf.hpp"
-#include "z_tf.hpp"
-#include <chrono>
-#include "pid_controller.hpp"
-#include <deque>
-#include <queue>
-#include "ring_queue.hpp"
+#include <stdio.h>
+#include <stdint.h>
+#include "control_system/pid_controller.hpp"
+#include "control_system/saturation.hpp"
 
-using namespace std;
+#define os_printf printf
 
-class RunTimeStatus
-{
-private:
-    decltype(chrono::steady_clock::now()) startTime;
-
-public:
-    RunTimeStatus()
-    {
-        startTime = chrono::steady_clock::now();
-    }
-
-    void Start()
-    {
-        startTime = chrono::steady_clock::now();
-    }
-
-    void End(const string &info = "Time: ")
-    {
-        chrono::duration<double, milli> elapsedTime = chrono::steady_clock::now() - startTime;
-        cout << info << elapsedTime.count() << " ms" << endl;
-    }
-};
-
-static double inputs[3], outputs[3];
-
-void FastStepReset()
-{
-    for (size_t i = 0; i < 3; i++) {
-        inputs[i]  = 0;
-        outputs[i] = 0;
-    }
-}
-
-double FastStep(double input)
-{
-    inputs[2] = inputs[1];
-    inputs[1] = inputs[0];
-    inputs[0] = input;
-
-    outputs[2] = outputs[1];
-    outputs[1] = outputs[0];
-
-    outputs[0] = 66.2117333333333 * inputs[0] - 124.136000000000 * inputs[1] + 58.1856000000000 * inputs[2] + 0.333333333333333 * outputs[1] + 0.666666666666667 * outputs[2];
-    return outputs[0];
-}
-
-void FastStepTest()
-{
-    RunTimeStatus timer;
-    timer.Start();
-    for (size_t i = 0; i < 100000000; i++) {
-        FastStep(1);
-    }
-    timer.End("FastStep: ");
-    cout << FastStep(1) << endl
-         << endl;
-    FastStepReset();
-
-    for (size_t i = 0; i < 10; i++) {
-        cout << FastStep(1) << endl;
-    }
-    for (size_t i = 0; i < 10; i++) {
-        cout << FastStep(-1) << endl;
-    }
-    cout << endl;
-}
+using namespace control_system;
 
 template <typename T>
-void TfSpeedTest(T &tf, const string &info = "Time: ")
+void PidStepTest(DiscreteTf<T> &controller, const uint32_t loop_time = 200000)
 {
-    RunTimeStatus timer;
-    timer.Start();
-    for (size_t i = 0; i < 100000000; i++) {
-        tf.Step(1);
-    }
-    timer.End(info);
-    cout << tf.Step(1) << endl
-         << endl;
+    // uint32_t start_time = HPT_GetUs();
+    // for (size_t i = 0; i < loop_time; i++) {
+    //     controller.Step(1);
+    // }
+    // auto duration = HPT_GetUs() - start_time;
+    // auto speed    = (float)loop_time / duration * 1000.0f;
+    // os_printf("Step(1) for %lu times: duration: %lu us, speed: %g kps\n", loop_time, duration, speed);
 
-    tf.ResetState();
+    // os_printf("Step(1) from %lu to %lu times:\n", loop_time + 1, loop_time + 11);
+    // for (size_t i = 0; i < 10; i++) {
+    //     os_printf("%g\t", controller.Step(1));
+    // }
+
+    os_printf("\n\nStep(1) from tick 1 to 10:\n");
+    // controller.ResetState();
     for (size_t i = 0; i < 10; i++) {
-        cout << tf.Step(1) << endl;
+        os_printf("%g\t", controller.Step(1));
     }
+
+    os_printf("\nThen Step(-1) from tick 11 to 20:\n");
     for (size_t i = 0; i < 10; i++) {
-        cout << tf.Step(-1) << endl;
+        os_printf("%g\t", controller.Step(-1));
     }
-    cout << endl;
+    os_printf("\n");
 }
 
-int main(int, char const **)
+int main(int, char **)
 {
-    RunTimeStatus run_time_status;
-    ZTf<double> ztf({66.2117333333333, -124.136, 58.1856},
-                    {1.0, -0.333333333333333, -0.666666666666667});
-
-    // PidnAntiWindup<float> pidna(1, 2, 0, 100, 0.1, 3, -3);
-    // Pidn<float> pidn(1, 2, 0, 100, 0.1);
-    // Pdn<float> pdn(1, 2, 100, 0.1);
-
-    FastStepTest();
-
-    // TfSpeedTest(pidn, "pidn: ");
-    TfSpeedTest(ztf, "ztf: ");
-
-    // TfSpeedTest(pdn, "pdn: ");
-    // TfSpeedTest(pidn, "pidn: ");
-    // TfSpeedTest(pidna, "pidna: ");
-
+    os_printf("\npid_controller:\n");
+    pid::PID_AntiWindup<double> pid_controller{2, 100, 0, 100, 0.01, 50, -5, 5};
+    // pid_controller.i_controller.SetOutputMinMax(-5, 5);
+    PidStepTest(pid_controller);
     return 0;
 }

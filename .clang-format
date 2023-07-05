@@ -11,7 +11,7 @@ IndentWidth: 4
 TabWidth: 4
 ColumnLimit: 0
 AccessModifierOffset: -4
-NamespaceIndentation: All
+# NamespaceIndentation: All
 FixNamespaceComments: false
 BreakBeforeBraces: Linux
 

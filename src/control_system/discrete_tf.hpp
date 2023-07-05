@@ -1,4 +1,18 @@
+/**
+ * @file discrete_tf.hpp
+ * @author X. Y.  
+ * @brief 离散控制器
+ * @version 0.1
+ * @date 2023-07-05
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
+
 #pragma once
+
+namespace control_system
+{
 
 /**
  * @brief 离散传递函数
@@ -25,3 +39,5 @@ public:
      */
     virtual void ResetState() = 0;
 };
+
+} // namespace control_system
