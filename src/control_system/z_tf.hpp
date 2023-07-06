@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "discrete_tf.hpp"
+#include "discrete_controller_base.hpp"
 #include <vector>
 #include <cassert>
 
@@ -24,7 +24,7 @@ namespace control_system
  * @tparam T 数据类型，例如 float 或 double
  */
 template <typename T>
-class ZTf : public DiscreteTf<T>
+class ZTf : public DiscreteControllerBase<T>
 {
 private:
     std::vector<T> input_coefficient_, output_coefficient_; // 输入系数 i1, i2, ... 和输出系数 o1, o2, ...

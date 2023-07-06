@@ -1,8 +1,8 @@
 /**
- * @file discrete_tf.hpp
+ * @file discrete_controller_base.hpp
  * @author X. Y.  
- * @brief 离散控制器
- * @version 0.1
+ * @brief 离散控制器基类
+ * @version 0.2
  * @date 2023-07-05
  * 
  * @copyright Copyright (c) 2023
@@ -15,15 +15,13 @@ namespace control_system
 {
 
 /**
- * @brief 离散传递函数
+ * @brief 离散控制器基类
  *
  * @tparam T 数据类型，例如 float 或 double
  */
 template <typename T>
-class DiscreteTf
+class DiscreteControllerBase
 {
-private:
-    /* data */
 public:
     /**
      * @brief 走一个周期
@@ -34,7 +32,7 @@ public:
     virtual T Step(T input) = 0;
 
     /**
-     * @brief 重置传函内部状态
+     * @brief 重置控制器内部状态
      *
      */
     virtual void ResetState() = 0;
