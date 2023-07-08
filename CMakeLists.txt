@@ -31,6 +31,7 @@ add_executable(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     .
+    src
     # ${OpenCV_INCLUDE_DIRS}
 )
 

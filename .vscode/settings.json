@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.m": "matlab",
         "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
@@ -50,6 +51,8 @@
         "semaphore": "cpp",
         "stop_token": "cpp",
         "thread": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "forward_list": "cpp",
+        "cassert": "cpp"
     }
 }
