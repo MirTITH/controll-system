@@ -11,8 +11,6 @@
 using namespace control_system;
 using namespace std;
 
-
-
 template <typename T>
 void StepTest(DiscreteControllerBase<T> &controller, uint32_t loop_time = 10000000)
 {
@@ -49,36 +47,10 @@ int main(int, char **)
     // 其中内部运算数据类型为 float
     // 分子为 66 z^2 - 124 z + 58
     // 分母为 z^2 - 0.333 z - 0.667
-    ZTf<double> ztf({66.2117333333333, -124.136000000000},
-                    {1, -0.333333333333333, -0.666666666666667});
+    ZTf<double> ztf({1, 2}, {1, 2, 3, 4, 5});
 
     printf("==== Old ztf: ====\n");
     StepTest(ztf);
-
-    new_design::ZTf<double> newztf({66.2117333333333, -124.136000000000},
-                                   {1, -0.333333333333333, -0.666666666666667});
-    printf("==== New ztf: ====\n");
-    StepTest(newztf);
-
-    // new_design2::ZTf<double> newztf2({66.2117333333333, -124.136000000000},
-    //                                {1, -0.333333333333333, -0.666666666666667});
-    // printf("==== New ztf2: ====\n");
-    // StepTest(newztf2);
-
-    // forward_list<float> flist{1.0, 2.1, 3.22, 5.43};
-
-    // auto iter = flist.cbegin();
-    // while (std::next(iter, 2) != flist.cend()) {
-    //     ++iter;
-    // }
-
-    // cout << " *iter: " << *iter << endl;
-    // flist.splice_after(flist.cbefore_begin(), flist, iter);
-    // cout << " *iter: " << *iter << endl;
-
-    // for (auto var : flist) {
-    //     cout << var << endl;
-    // }
 
     return 0;
 }

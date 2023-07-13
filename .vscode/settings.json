@@ -54,5 +54,6 @@
         "queue": "cpp",
         "forward_list": "cpp",
         "cassert": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": true
 }
